@@ -96,9 +96,20 @@ pu_t__op_s__c_jqda = aws.kinesis.FirehoseDeliveryStream("PUT-OPS-CJqda",
         # compression_format="GZIP",
     ),
     name="PUT-OPS-CJqda",
-    )
-    
-    
-    
-    
+    elasticsearch_configuration=aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationArgs(
+        domain_arn=ekk_log_us_east_1.arn,
+        role_arn=ekk_firehose.arn,
+        index_name="apachelog",
+        # type_name="log",
+        processing_configuration=aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationArgs(
+            enabled=False,
+            # processors=[aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationProcessorArgs(
+            #     type="Lambda",
+            #     parameters=[aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationProcessorParameterArgs(
+            #         parameter_name="LambdaArn",
+            #         parameter_value=f"{aws_lambda_function['lambda_processor']['arn']}:$LATEST",
+            #     )],
+            # )],
+        ),
+    ))
     
