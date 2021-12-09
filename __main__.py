@@ -87,7 +87,14 @@ ekk_log_us_east_1 = aws.elasticsearch.Domain("ekk-log-us-east-1",
     )
     
 pu_t__op_s__c_jqda = aws.kinesis.FirehoseDeliveryStream("PUT-OPS-CJqda",
-    destination="extended_s3",
+    destination="elasticsearch",
+    s3_configuration=aws.kinesis.FirehoseDeliveryStreamS3ConfigurationArgs(
+        role_arn=ekk_firehose.arn,
+        bucket_arn=bucket.arn,
+        buffer_size=10,
+        buffer_interval=400,
+        # compression_format="GZIP",
+    ),
     name="PUT-OPS-CJqda",
     )
     
