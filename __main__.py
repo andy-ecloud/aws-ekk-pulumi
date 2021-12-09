@@ -3,6 +3,15 @@
 import pulumi
 from pulumi_aws import s3
 import pulumi_aws as aws
+import json
+
+# get current region
+current = aws.get_caller_identity()
+pulumi.export("accountId", current.account_id)
+pulumi.export("callerArn", current.arn)
+pulumi.export("callerUser", current.user_id)
+
+pulumi.export("region id:", aws.get_region().id)
 
 # Create an AWS resource (S3 Bucket)
 bucket = s3.Bucket('my-bucket')
@@ -48,15 +57,39 @@ ekk_lambda = aws.iam.Role("EKK-Lambda",
     )
 
 
-# ekk_log_us_east_1 = aws.elasticsearch.Domain("ekk-log-us-east-1",
-#     domain_name="ekk-log-us-east-1",
-#     elasticsearch_version="OpenSearch_1.0",
-#     )
+ip = "59.124.14.121/32"
+opensearch_domain = "ekk-log-test"
+ekk_log_us_east_1 = aws.elasticsearch.Domain("ekk-log-us-east-1",
+    domain_name="ekk-log-us-east-1",
+    elasticsearch_version="OpenSearch_1.0",
+    access_policies=pulumi.Output.all([opensearch_domain, ip]).apply(
+            lambda args: json.dumps(
+               {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": {
+                        "AWS": "*"
+                      },
+                      "Action": "es:*",
+                      "Resource": "arn:aws:es:{}:{}:domain/{}/*".format(aws.get_region().id, current.account_id, args[0]),
+                      "Condition": {
+                        "IpAddress": {
+                          "aws:SourceIp": "{}".format(args[1])
+                        }
+                      }
+                    }
+                  ]
+                }
+            )
+        ),
+    )
     
-# pu_t__op_s__c_jqda = aws.kinesis.FirehoseDeliveryStream("PUT-OPS-CJqda",
-#     destination="extended_s3",
-#     name="PUT-OPS-CJqda",
-#     )
+pu_t__op_s__c_jqda = aws.kinesis.FirehoseDeliveryStream("PUT-OPS-CJqda",
+    destination="extended_s3",
+    name="PUT-OPS-CJqda",
+    )
     
     
     
