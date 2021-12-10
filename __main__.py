@@ -248,6 +248,24 @@ sudo sh ~/test.sh
 )
 pulumi.export("userdata", userdata)
 
+my_vpc = aws.ec2.Vpc("myVpc",
+    cidr_block="172.16.0.0/16",
+    tags={
+        "Name": "tf-example",
+    })
+my_subnet = aws.ec2.Subnet("mySubnet",
+    vpc_id=my_vpc.id,
+    cidr_block="172.16.10.0/24",
+    availability_zone="us-west-2a",
+    tags={
+        "Name": "tf-example",
+    })
+igw = aws.ec2.InternetGateway("gw",
+    vpc_id=my_vpc.id,
+    tags={
+        "Name": "main",
+    })
+
 security_group = aws.ec2.SecurityGroup('all-traffic',
     description='Enable HTTP access',
     ingress=[aws.ec2.SecurityGroupIngressArgs(
