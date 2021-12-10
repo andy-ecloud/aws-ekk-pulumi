@@ -4,6 +4,8 @@ import pulumi
 from pulumi_aws import s3
 import pulumi_aws as aws
 import json
+import pulumi_tls as tls
+
 
 # get current region
 current = aws.get_caller_identity()
@@ -13,8 +15,15 @@ pulumi.export("callerUser", current.user_id)
 
 pulumi.export("region id:", aws.get_region().id)
 
+config = pulumi.Config()
+print('Password: {}'.format(config.require('dbPassword')))
+
+ip = "59.124.14.121/32"
+opensearch_domain = "ekk-log-test"
+ekk_firehose_name = "EKK-LogFirehose-apachelog"
+
 # Create an AWS resource (S3 Bucket)
-bucket = s3.Bucket('my-bucket')
+bucket = s3.Bucket('EKK-Bucket')
 
 # Export the name of the bucket
 pulumi.export('bucket_name', bucket.id)
@@ -57,14 +66,36 @@ ekk_lambda = aws.iam.Role("EKK-Lambda",
     )
 
 
-ip = "59.124.14.121/32"
-opensearch_domain = "ekk-log-test"
+
 ekk_log_us_east_1 = aws.elasticsearch.Domain("ekk-log-us-east-1",
     domain_name="ekk-log-us-east-1",
     elasticsearch_version="OpenSearch_1.0",
-    access_policies=pulumi.Output.all([opensearch_domain, ip]).apply(
+    ebs_options=aws.elasticsearch.DomainEbsOptionsArgs(
+        ebs_enabled=True,
+        volume_size=10,
+        volume_type="gp2"
+        ),
+    node_to_node_encryption=aws.elasticsearch.DomainNodeToNodeEncryptionArgs(
+        enabled=True
+        ),
+    encrypt_at_rest=aws.elasticsearch.DomainEncryptAtRestArgs(
+        enabled=True
+        ),
+    domain_endpoint_options=aws.elasticsearch.DomainDomainEndpointOptionsArgs(
+        enforce_https=True,
+        tls_security_policy="Policy-Min-TLS-1-0-2019-07"
+        ),
+    advanced_security_options=aws.elasticsearch.DomainAdvancedSecurityOptionsArgs(
+        enabled=True,
+        internal_user_database_enabled=True,
+        master_user_options=aws.elasticsearch.DomainAdvancedSecurityOptionsMasterUserOptionsArgs(
+            master_user_name="admin",
+            master_user_password=config.require('dbPassword')
+            ),
+        ),
+    access_policies=pulumi.Output.all(opensearch_domain, ip).apply(
             lambda args: json.dumps(
-               {
+              {
                   "Version": "2012-10-17",
                   "Statement": [
                     {
@@ -85,8 +116,10 @@ ekk_log_us_east_1 = aws.elasticsearch.Domain("ekk-log-us-east-1",
             )
         ),
     )
-    
-pu_t__op_s__c_jqda = aws.kinesis.FirehoseDeliveryStream("PUT-OPS-CJqda",
+pulumi.export("es domain:", ekk_log_us_east_1.endpoint)
+ 
+
+ekk_firehose = aws.kinesis.FirehoseDeliveryStream(ekk_firehose_name,
     destination="elasticsearch",
     s3_configuration=aws.kinesis.FirehoseDeliveryStreamS3ConfigurationArgs(
         role_arn=ekk_firehose.arn,
@@ -95,7 +128,7 @@ pu_t__op_s__c_jqda = aws.kinesis.FirehoseDeliveryStream("PUT-OPS-CJqda",
         buffer_interval=400,
         # compression_format="GZIP",
     ),
-    name="PUT-OPS-CJqda",
+    name=ekk_firehose_name,
     elasticsearch_configuration=aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationArgs(
         domain_arn=ekk_log_us_east_1.arn,
         role_arn=ekk_firehose.arn,
@@ -112,4 +145,111 @@ pu_t__op_s__c_jqda = aws.kinesis.FirehoseDeliveryStream("PUT-OPS-CJqda",
             # )],
         ),
     ))
+pulumi.export("firehose:", ekk_firehose.id) 
     
+kinesis_agent_json=pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
+    json.dumps(
+        {
+          "cloudwatch.emitMetrics": True,
+          "firehose.endpoint": "{}".format(ekk_log_us_east_1.endpoint),
+          "flows": [
+            {
+              "filePattern": "/var/log/httpd/access_log*",
+              "deliveryStream": "{}".format(args[0]),
+              "dataProcessingOptions": [
+                {
+                  "optionName": "LOGTOJSON",
+                  "logFormat": "COMMONAPACHELOG"
+                }
+              ]
+            }
+          ]
+        }
+    )
+)
+
+kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
+    json.dumps(
+        {
+          "cloudwatch.emitMetrics": True,
+          "firehose.endpoint": "{}".format(ekk_log_us_east_1.endpoint),
+          "flows": [
+            {
+              "filePattern": "/var/log/httpd/access_log*",
+              "deliveryStream": "{}".format(args[0]),
+              "dataProcessingOptions": [
+                {
+                  "optionName": "LOGTOJSON",
+                  "logFormat": "COMMONAPACHELOG"
+                }
+              ]
+            }
+          ]
+        }
+    )
+)
+userdata = pulumi.Output.concat(
+    """#!/bin/bash
+    # install 
+    sudo yum install aws-kinesis-agent –y 
+    sudo yum install aws-kinesis-agent –y 
+    cat > /etc/aws-kinesis/agent.json << EOF
+    """,
+    """{\"cloudwatch.emitMetrics\": true, \"firehose.endpoint\": \"""",
+    ekk_log_us_east_1.endpoint,
+    """\", \"flows\": [{\"filePattern\": \"/var/log/httpd/access_log*\", \"deliveryStream\": \"""",
+    ekk_firehose_name,
+    """\", \"dataProcessingOptions\": [{\"optionName\": \"LOGTOJSON\", \"logFormat\": \"COMMONAPACHELOG\"}]}]}\n""",
+    """
+    EOF
+    
+    sudo service aws-kinesis-agent start
+    sudo chkconfig aws-kinesis-agent on
+    """
+)
+pulumi.export("userdata", userdata)
+
+security_group = aws.ec2.SecurityGroup('all-traffic',
+    description='Enable HTTP access',
+    ingress=[aws.ec2.SecurityGroupIngressArgs(
+        protocol='tcp',
+        from_port=1,
+        to_port=65535,
+        cidr_blocks=['0.0.0.0/0'],
+    )],
+    egress=[aws.ec2.SecurityGroupEgressArgs(
+        from_port=0,
+        to_port=0,
+        protocol="-1",
+        cidr_blocks=["0.0.0.0/0"],
+        ipv6_cidr_blocks=["::/0"],
+    )])
+    
+ami = aws.ec2.get_ami(most_recent=True,
+                  owners=["amazon"],
+                  filters=[aws.GetAmiFilterArgs(name="name", values=["amzn2-ami-kernel-5.10*"])])
+                  
+# create key
+private_key = tls.PrivateKey('private_key',
+              algorithm = 'RSA',
+              rsa_bits=2048)
+               
+pulumi.export('public openssh', private_key.public_key_openssh)
+pulumi.export('public pem', private_key.public_key_pem)
+pulumi.export('private pem', private_key.private_key_pem)
+
+# create key pair
+keypair = aws.ec2.KeyPair("keypair",
+    key_name="keypair",
+    public_key=private_key.public_key_openssh)
+                  
+ec2_apachelog_poc = aws.ec2.Instance('EC2-ApacheLog-poc',
+    instance_type='t3.micro',
+#     iam_instance_profile=instance_profile.name,
+    vpc_security_group_ids=[security_group.id],
+    user_data=userdata,
+    ami=ami.id,
+    key_name=keypair.id,
+    tags={"Name": "EC2-ApacheLog-poc"},
+    volume_tags={"Name": "EC2-ApacheLog-poc"},
+    )

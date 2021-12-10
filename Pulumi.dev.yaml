@@ -1,2 +1,4 @@
 config:
+  aws-es-firehose:dbPassword:
+    secure: AAABAJGC5xrCk7v1YB2+zHADfx2+dONQ4JU84xEH+dWHBYXqQSjVz6b+Sv8nRm3wgk93Ow==
   aws:region: us-east-1
