@@ -19,7 +19,7 @@ config = pulumi.Config()
 print('Password: {}'.format(config.require('dbPassword')))
 
 ip = "59.124.14.121/32"
-opensearch_domain = "ekk-log-test"
+opensearch_domain = "ekk-log-us-east-1"
 ekk_firehose_name = "EKK-LogFirehose-apachelog"
 
 # Create an AWS resource (S3 Bucket)
@@ -67,8 +67,8 @@ ekk_lambda = aws.iam.Role("EKK-Lambda",
 
 
 
-ekk_log_us_east_1 = aws.elasticsearch.Domain("ekk-log-us-east-1",
-    domain_name="ekk-log-us-east-1",
+ekk_log_us_east_1 = aws.elasticsearch.Domain(opensearch_domain,
+    domain_name=opensearch_domain,
     elasticsearch_version="OpenSearch_1.0",
     ebs_options=aws.elasticsearch.DomainEbsOptionsArgs(
         ebs_enabled=True,
@@ -146,7 +146,8 @@ ekk_firehose = aws.kinesis.FirehoseDeliveryStream(ekk_firehose_name,
         ),
     ))
 pulumi.export("firehose:", ekk_firehose.id) 
-    
+pulumi.export("firehose tags all:", ekk_firehose.tags_all)   
+
 kinesis_agent_json=pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
     json.dumps(
         {
@@ -189,23 +190,61 @@ kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
     )
 )
 userdata = pulumi.Output.concat(
-    """#!/bin/bash
-    # install 
-    sudo yum install aws-kinesis-agent –y 
-    sudo yum install aws-kinesis-agent –y 
-    cat > /etc/aws-kinesis/agent.json << EOF
-    """,
-    """{\"cloudwatch.emitMetrics\": true, \"firehose.endpoint\": \"""",
-    ekk_log_us_east_1.endpoint,
-    """\", \"flows\": [{\"filePattern\": \"/var/log/httpd/access_log*\", \"deliveryStream\": \"""",
-    ekk_firehose_name,
-    """\", \"dataProcessingOptions\": [{\"optionName\": \"LOGTOJSON\", \"logFormat\": \"COMMONAPACHELOG\"}]}]}\n""",
-    """
-    EOF
-    
-    sudo service aws-kinesis-agent start
-    sudo chkconfig aws-kinesis-agent on
-    """
+"""#!/bin/bash
+# install 
+sudo yum install aws-kinesis-agent –y -y
+# sudo yum install aws-kinesis-agent –y 
+cat > /etc/aws-kinesis/agent.json << EOF
+""",
+"""{\"cloudwatch.emitMetrics\": true, \"firehose.endpoint\": \"""",
+ekk_log_us_east_1.endpoint,
+"""\", \"flows\": [{\"filePattern\": \"/var/log/httpd/access_log*\", \"deliveryStream\": \"""",
+ekk_firehose_name,
+"""\", \"dataProcessingOptions\": [{\"optionName\": \"LOGTOJSON\", \"logFormat\": \"COMMONAPACHELOG\"}]}]}\n""",
+"""EOF
+
+sudo service aws-kinesis-agent start
+sudo chkconfig aws-kinesis-agent on
+
+sudo yum install -y git
+git clone https://github.com/kiritbasu/Fake-Apache-Log-Generator.git
+sudo yum install python-pip -y
+cd Fake-Apache-Log-Generator/
+sudo pip install -r requirements.txt
+cd ~
+""",
+"""echo \"#!/bin/bash
+
+# chkconfig: 2345 10 90
+
+cd /var/log/httpd/
+
+while true
+
+do
+
+sudo python /Fake-Apache-Log-Generator/apache-fake-log-gen.py -n 100 -o LOG
+
+sleep 10
+
+done\" > ~/test.sh
+""",
+"""
+cat > ~/test.sh << EOF
+#!/bin/bash
+# chkconfig: 2345 10 90
+mkdir -p /var/log/httpd/
+cd /var/log/httpd/
+while true
+do
+sudo python /Fake-Apache-Log-Generator/apache-fake-log-gen.py -n 100 -o LOG
+sleep 10
+done
+""",
+"""EOF
+sudo sh ~/test.sh
+"""
+
 )
 pulumi.export("userdata", userdata)
 
