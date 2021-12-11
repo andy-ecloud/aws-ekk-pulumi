@@ -189,6 +189,8 @@ kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
         }
     )
 )
+
+
 userdata = pulumi.Output.concat(
 """#!/bin/bash
 # install 
@@ -197,7 +199,7 @@ sudo yum install aws-kinesis-agent –y -y
 cat > /etc/aws-kinesis/agent.json << EOF
 """,
 """{\"cloudwatch.emitMetrics\": true, \"firehose.endpoint\": \"""",
-ekk_log_us_east_1.endpoint,
+"",
 """\", \"flows\": [{\"filePattern\": \"/var/log/httpd/access_log*\", \"deliveryStream\": \"""",
 ekk_firehose_name,
 """\", \"dataProcessingOptions\": [{\"optionName\": \"LOGTOJSON\", \"logFormat\": \"COMMONAPACHELOG\"}]}]}\n""",
@@ -251,22 +253,23 @@ pulumi.export("userdata", userdata)
 my_vpc = aws.ec2.Vpc("myVpc",
     cidr_block="172.16.0.0/16",
     tags={
-        "Name": "tf-example",
+        "Name": "pulumi vpc",
     })
 my_subnet = aws.ec2.Subnet("mySubnet",
     vpc_id=my_vpc.id,
     cidr_block="172.16.10.0/24",
     availability_zone="us-west-2a",
     tags={
-        "Name": "tf-example",
+        "Name": "pulumi subnet",
     })
 igw = aws.ec2.InternetGateway("gw",
     vpc_id=my_vpc.id,
     tags={
-        "Name": "main",
+        "Name": "pulumi igw",
     })
 
 security_group = aws.ec2.SecurityGroup('all-traffic',
+    vpc_id=my_vpc.id,
     description='Enable HTTP access',
     ingress=[aws.ec2.SecurityGroupIngressArgs(
         protocol='tcp',
@@ -301,6 +304,7 @@ keypair = aws.ec2.KeyPair("keypair",
     public_key=private_key.public_key_openssh)
                   
 ec2_apachelog_poc = aws.ec2.Instance('EC2-ApacheLog-poc',
+    subnet_id=my_subnet.id,
     instance_type='t3.micro',
 #     iam_instance_profile=instance_profile.name,
     vpc_security_group_ids=[security_group.id],
