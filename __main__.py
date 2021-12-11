@@ -215,12 +215,16 @@ test_lambda = aws.lambda_.Function("testLambda",
         }
     ),
     )
- 
+    
+# lambda log group
+ekk_log_group = aws.cloudwatch.LogGroup("ekk_LogGroup",
+    name=pulumi.Output.concat("/aws/lambda/", test_lambda.id)
+    )
  
 allow_cloudwatch = aws.lambda_.Permission("allowCloudwatch",
     action="lambda:InvokeFunction",
     function=test_lambda.name,
-    principal="logs.us-west-2.amazonaws.com",
+    principal="logs.amazonaws.com",
     source_arn=pulumi.Output.concat(example_log_group.arn, ":*"),
     # qualifier=test_alias.name,
     statement_id = "allow-cloudwatch-lambda"
