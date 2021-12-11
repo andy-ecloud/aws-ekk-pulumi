@@ -203,7 +203,7 @@ pulumi.export("es domain:", ekk_log_us_east_1.endpoint)
  
 # Lambda
 test_lambda = aws.lambda_.Function("testLambda",
-    code=pulumi.FileArchive("./lambda_code/lambda.zip"),
+    code=pulumi.FileArchive("./lambda_code/index.zip"),
     role=ekk_lambda.arn,
     handler="index.handler",
     runtime="nodejs12.x",
