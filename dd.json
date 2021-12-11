@@ -1,0 +1,861 @@
+{
+    "version": 3,
+    "deployment": {
+        "manifest": {
+            "time": "2021-12-11T18:56:58.743672912Z",
+            "magic": "7cffb80ece1642292eaacc070abe5a36c1e31c0ef8a9dccbafa317d9055f9c44",
+            "version": "v3.19.0"
+        },
+        "secrets_providers": {
+            "type": "service",
+            "state": {
+                "url": "https://api.pulumi.com",
+                "owner": "andy-ecloud",
+                "project": "aws-es-firehose",
+                "stack": "ecv"
+            }
+        },
+        "resources": [
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "custom": false,
+                "type": "pulumi:pulumi:Stack",
+                "outputs": {
+                    "accountId": "863936362823",
+                    "bucket_name": "ekk-bucket-fcb8c37",
+                    "callerArn": "arn:aws:sts::863936362823:assumed-role/admin-ec2/RoleSession1",
+                    "callerUser": "AROA4SJU6XFDYQSXRCQQD:RoleSession1",
+                    "es domain:": "search-ekk-log-us-east-1-f2xy2xpemixkc2qrbhhl5wel5e.us-west-2.es.amazonaws.com",
+                    "firehose tags all:": {},
+                    "firehose:": "arn:aws:firehose:us-west-2:863936362823:deliverystream/EKK-LogFirehose-apachelog",
+                    "log group arn": "arn:aws:logs:us-west-2:863936362823:log-group:exampleLogGroup-f351627",
+                    "region id:": "us-west-2"
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default",
+                "custom": true,
+                "id": "99edb5cb-ca7c-42e5-b766-d2e8859df0bc",
+                "type": "pulumi:providers:aws",
+                "inputs": {
+                    "profile": "ecv",
+                    "region": "us-west-2",
+                    "version": "4.32.0"
+                },
+                "outputs": {
+                    "profile": "ecv",
+                    "region": "us-west-2",
+                    "version": "4.32.0"
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0",
+                "custom": true,
+                "id": "710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "type": "pulumi:providers:aws",
+                "inputs": {
+                    "profile": "ecv",
+                    "region": "us-west-2",
+                    "version": "4.32.0"
+                },
+                "outputs": {
+                    "profile": "ecv",
+                    "region": "us-west-2",
+                    "version": "4.32.0"
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:s3/bucket:Bucket::ekk-bucket",
+                "custom": true,
+                "id": "ekk-bucket-fcb8c37",
+                "type": "aws:s3/bucket:Bucket",
+                "inputs": {
+                    "__defaults": [
+                        "acl",
+                        "bucket"
+                    ],
+                    "acl": "private",
+                    "bucket": "ekk-bucket-fcb8c37",
+                    "forceDestroy": true
+                },
+                "outputs": {
+                    "accelerationStatus": "",
+                    "acl": "private",
+                    "arn": "arn:aws:s3:::ekk-bucket-fcb8c37",
+                    "bucket": "ekk-bucket-fcb8c37",
+                    "bucketDomainName": "ekk-bucket-fcb8c37.s3.amazonaws.com",
+                    "bucketRegionalDomainName": "ekk-bucket-fcb8c37.s3.us-west-2.amazonaws.com",
+                    "corsRules": [],
+                    "forceDestroy": true,
+                    "grants": [],
+                    "hostedZoneId": "Z3BJ6K6RIION7M",
+                    "id": "ekk-bucket-fcb8c37",
+                    "lifecycleRules": [],
+                    "loggings": [],
+                    "objectLockConfiguration": null,
+                    "policy": "",
+                    "region": "us-west-2",
+                    "replicationConfiguration": null,
+                    "requestPayer": "BucketOwner",
+                    "serverSideEncryptionConfiguration": null,
+                    "tags": {},
+                    "tagsAll": {},
+                    "versioning": {
+                        "enabled": false,
+                        "mfaDelete": false
+                    },
+                    "website": null
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "forceDestroy": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:cloudwatch/logGroup:LogGroup::exampleLogGroup",
+                "custom": true,
+                "id": "exampleLogGroup-f351627",
+                "type": "aws:cloudwatch/logGroup:LogGroup",
+                "inputs": {
+                    "__defaults": [
+                        "name",
+                        "retentionInDays"
+                    ],
+                    "name": "exampleLogGroup-f351627",
+                    "retentionInDays": 0
+                },
+                "outputs": {
+                    "arn": "arn:aws:logs:us-west-2:863936362823:log-group:exampleLogGroup-f351627",
+                    "id": "exampleLogGroup-f351627",
+                    "kmsKeyId": "",
+                    "name": "exampleLogGroup-f351627",
+                    "retentionInDays": 0,
+                    "tags": {},
+                    "tagsAll": {}
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4"
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::testRole",
+                "custom": true,
+                "id": "testRole-efff7c8",
+                "type": "aws:iam/role:Role",
+                "inputs": {
+                    "__defaults": [
+                        "forceDetachPolicies",
+                        "maxSessionDuration",
+                        "name",
+                        "path"
+                    ],
+                    "assumeRolePolicy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"Service\": \"cloudtrail.amazonaws.com\"\n      },\n      \"Action\": \"sts:AssumeRole\"\n    }\n  ]\n}\n",
+                    "forceDetachPolicies": false,
+                    "maxSessionDuration": 3600,
+                    "name": "testRole-efff7c8",
+                    "path": "/"
+                },
+                "outputs": {
+                    "arn": "arn:aws:iam::863936362823:role/testRole-efff7c8",
+                    "assumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                    "createDate": "2021-12-11T15:04:50Z",
+                    "description": "",
+                    "forceDetachPolicies": false,
+                    "id": "testRole-efff7c8",
+                    "inlinePolicies": [
+                        {
+                            "name": "",
+                            "policy": ""
+                        }
+                    ],
+                    "managedPolicyArns": [],
+                    "maxSessionDuration": 3600,
+                    "name": "testRole-efff7c8",
+                    "namePrefix": "",
+                    "path": "/",
+                    "tags": {},
+                    "tagsAll": {},
+                    "uniqueId": "AROA4SJU6XFDZT6ELGADM"
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "assumeRolePolicy": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:iam/rolePolicy:RolePolicy::testRolePolicy",
+                "custom": true,
+                "id": "testRole-efff7c8:testRolePolicy-d09f4ff",
+                "type": "aws:iam/rolePolicy:RolePolicy",
+                "inputs": {
+                    "__defaults": [
+                        "name"
+                    ],
+                    "name": "testRolePolicy-d09f4ff",
+                    "policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Sid\": \"AWSCloudTrailCreateLogStream\", \"Effect\": \"Allow\", \"Action\": [\"logs:CreateLogStream\", \"logs:PutLogEvents\"], \"Resource\": \"*\"}]}",
+                    "role": "testRole-efff7c8"
+                },
+                "outputs": {
+                    "id": "testRole-efff7c8:testRolePolicy-d09f4ff",
+                    "name": "testRolePolicy-d09f4ff",
+                    "policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Sid\": \"AWSCloudTrailCreateLogStream\", \"Effect\": \"Allow\", \"Action\": [\"logs:CreateLogStream\", \"logs:PutLogEvents\"], \"Resource\": \"*\"}]}",
+                    "role": "testRole-efff7c8"
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "dependencies": [
+                    "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::testRole"
+                ],
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "policy": null,
+                    "role": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::testRole"
+                    ]
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:cloudtrail/trail:Trail::exampleTrail",
+                "custom": true,
+                "id": "exampleTrail-d4ea183",
+                "type": "aws:cloudtrail/trail:Trail",
+                "inputs": {
+                    "__defaults": [
+                        "enableLogging",
+                        "isOrganizationTrail",
+                        "name"
+                    ],
+                    "cloudWatchLogsGroupArn": "arn:aws:logs:us-west-2:863936362823:log-group:exampleLogGroup-f351627:*",
+                    "cloudWatchLogsRoleArn": "arn:aws:iam::863936362823:role/testRole-efff7c8",
+                    "enableLogFileValidation": true,
+                    "enableLogging": true,
+                    "includeGlobalServiceEvents": true,
+                    "isMultiRegionTrail": true,
+                    "isOrganizationTrail": false,
+                    "name": "exampleTrail-d4ea183",
+                    "s3BucketName": "ekk-bucket-fcb8c37",
+                    "s3KeyPrefix": "prefix"
+                },
+                "outputs": {
+                    "advancedEventSelectors": [],
+                    "arn": "arn:aws:cloudtrail:us-west-2:863936362823:trail/exampleTrail-d4ea183",
+                    "cloudWatchLogsGroupArn": "arn:aws:logs:us-west-2:863936362823:log-group:exampleLogGroup-f351627:*",
+                    "cloudWatchLogsRoleArn": "arn:aws:iam::863936362823:role/testRole-efff7c8",
+                    "enableLogFileValidation": true,
+                    "enableLogging": true,
+                    "eventSelectors": [],
+                    "homeRegion": "us-west-2",
+                    "id": "exampleTrail-d4ea183",
+                    "includeGlobalServiceEvents": true,
+                    "insightSelectors": [],
+                    "isMultiRegionTrail": true,
+                    "isOrganizationTrail": false,
+                    "kmsKeyId": "",
+                    "name": "exampleTrail-d4ea183",
+                    "s3BucketName": "ekk-bucket-fcb8c37",
+                    "s3KeyPrefix": "prefix",
+                    "snsTopicName": "",
+                    "tags": {},
+                    "tagsAll": {}
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "dependencies": [
+                    "urn:pulumi:ecv::aws-es-firehose::aws:cloudwatch/logGroup:LogGroup::exampleLogGroup",
+                    "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::testRole",
+                    "urn:pulumi:ecv::aws-es-firehose::aws:s3/bucket:Bucket::ekk-bucket"
+                ],
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "cloudWatchLogsGroupArn": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:cloudwatch/logGroup:LogGroup::exampleLogGroup"
+                    ],
+                    "cloudWatchLogsRoleArn": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::testRole"
+                    ],
+                    "enableLogFileValidation": null,
+                    "includeGlobalServiceEvents": null,
+                    "isMultiRegionTrail": null,
+                    "s3BucketName": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:s3/bucket:Bucket::ekk-bucket"
+                    ],
+                    "s3KeyPrefix": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-Firhose",
+                "custom": true,
+                "id": "EKK-Firhose",
+                "type": "aws:iam/role:Role",
+                "inputs": {
+                    "__defaults": [],
+                    "assumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"firehose.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                    "description": "Allows Firhose to call AWS services on your behalf.",
+                    "forceDetachPolicies": false,
+                    "managedPolicyArns": [
+                        "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+                        "arn:aws:iam::aws:policy/CloudWatchFullAccess",
+                        "arn:aws:iam::aws:policy/AmazonESFullAccess"
+                    ],
+                    "maxSessionDuration": 3600,
+                    "name": "EKK-Firhose",
+                    "path": "/"
+                },
+                "outputs": {
+                    "arn": "arn:aws:iam::863936362823:role/EKK-Firhose",
+                    "assumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"firehose.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                    "createDate": "2021-12-11T14:40:50Z",
+                    "description": "Allows Firhose to call AWS services on your behalf.",
+                    "forceDetachPolicies": false,
+                    "id": "EKK-Firhose",
+                    "inlinePolicies": [
+                        {
+                            "name": "",
+                            "policy": ""
+                        }
+                    ],
+                    "managedPolicyArns": [
+                        "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+                        "arn:aws:iam::aws:policy/CloudWatchFullAccess",
+                        "arn:aws:iam::aws:policy/AmazonESFullAccess"
+                    ],
+                    "maxSessionDuration": 3600,
+                    "name": "EKK-Firhose",
+                    "namePrefix": "",
+                    "path": "/",
+                    "tags": {},
+                    "tagsAll": {},
+                    "uniqueId": "AROA4SJU6XFD5V24PXN3O"
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "assumeRolePolicy": null,
+                    "description": null,
+                    "forceDetachPolicies": null,
+                    "managedPolicyArns": null,
+                    "maxSessionDuration": null,
+                    "name": null,
+                    "path": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-EC2",
+                "custom": true,
+                "id": "EKK-EC2",
+                "type": "aws:iam/role:Role",
+                "inputs": {
+                    "__defaults": [],
+                    "assumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                    "description": "Allows EC2 instances to call AWS services on your behalf.",
+                    "forceDetachPolicies": false,
+                    "managedPolicyArns": [
+                        "arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess"
+                    ],
+                    "maxSessionDuration": 3600,
+                    "name": "EKK-EC2",
+                    "path": "/"
+                },
+                "outputs": {
+                    "arn": "arn:aws:iam::863936362823:role/EKK-EC2",
+                    "assumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                    "createDate": "2021-12-11T14:40:50Z",
+                    "description": "Allows EC2 instances to call AWS services on your behalf.",
+                    "forceDetachPolicies": false,
+                    "id": "EKK-EC2",
+                    "inlinePolicies": [
+                        {
+                            "name": "",
+                            "policy": ""
+                        }
+                    ],
+                    "managedPolicyArns": [
+                        "arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess"
+                    ],
+                    "maxSessionDuration": 3600,
+                    "name": "EKK-EC2",
+                    "namePrefix": "",
+                    "path": "/",
+                    "tags": {},
+                    "tagsAll": {},
+                    "uniqueId": "AROA4SJU6XFD2CBFUBOD5"
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "assumeRolePolicy": null,
+                    "description": null,
+                    "forceDetachPolicies": null,
+                    "managedPolicyArns": null,
+                    "maxSessionDuration": null,
+                    "name": null,
+                    "path": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-Lambda",
+                "custom": true,
+                "id": "EKK-Lambda",
+                "type": "aws:iam/role:Role",
+                "inputs": {
+                    "__defaults": [],
+                    "assumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                    "description": "Allows Lambda to call AWS services on your behalf.",
+                    "forceDetachPolicies": false,
+                    "managedPolicyArns": [
+                        "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+                        "arn:aws:iam::aws:policy/CloudWatchFullAccess",
+                        "arn:aws:iam::aws:policy/AmazonESFullAccess"
+                    ],
+                    "maxSessionDuration": 3600,
+                    "name": "EKK-Lambda",
+                    "path": "/"
+                },
+                "outputs": {
+                    "arn": "arn:aws:iam::863936362823:role/EKK-Lambda",
+                    "assumeRolePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                    "createDate": "2021-12-11T14:40:51Z",
+                    "description": "Allows Lambda to call AWS services on your behalf.",
+                    "forceDetachPolicies": false,
+                    "id": "EKK-Lambda",
+                    "inlinePolicies": [
+                        {
+                            "name": "",
+                            "policy": ""
+                        }
+                    ],
+                    "managedPolicyArns": [
+                        "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+                        "arn:aws:iam::aws:policy/CloudWatchFullAccess",
+                        "arn:aws:iam::aws:policy/AmazonESFullAccess"
+                    ],
+                    "maxSessionDuration": 3600,
+                    "name": "EKK-Lambda",
+                    "namePrefix": "",
+                    "path": "/",
+                    "tags": {},
+                    "tagsAll": {},
+                    "uniqueId": "AROA4SJU6XFDTNRWUK2P3"
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "assumeRolePolicy": null,
+                    "description": null,
+                    "forceDetachPolicies": null,
+                    "managedPolicyArns": null,
+                    "maxSessionDuration": null,
+                    "name": null,
+                    "path": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:elasticsearch/domain:Domain::ekk-log-us-east-1",
+                "custom": true,
+                "id": "arn:aws:es:us-west-2:863936362823:domain/ekk-log-us-east-1",
+                "type": "aws:elasticsearch/domain:Domain",
+                "inputs": {
+                    "__defaults": [],
+                    "accessPolicies": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"*\"}, \"Action\": \"es:*\", \"Resource\": \"arn:aws:es:us-west-2:863936362823:domain/ekk-log-us-east-1/*\", \"Condition\": {\"IpAddress\": {\"aws:SourceIp\": \"0.0.0.0/0\"}}}]}",
+                    "advancedSecurityOptions": {
+                        "__defaults": [],
+                        "enabled": true,
+                        "internalUserDatabaseEnabled": true,
+                        "masterUserOptions": {
+                            "__defaults": [],
+                            "masterUserName": "admin",
+                            "masterUserPassword": "ecloudvalleyABC123$$"
+                        }
+                    },
+                    "clusterConfig": {
+                        "__defaults": [
+                            "dedicatedMasterEnabled",
+                            "instanceCount"
+                        ],
+                        "dedicatedMasterEnabled": false,
+                        "instanceCount": 1,
+                        "instanceType": "t3.medium.elasticsearch"
+                    },
+                    "domainEndpointOptions": {
+                        "__defaults": [
+                            "customEndpointEnabled"
+                        ],
+                        "customEndpointEnabled": false,
+                        "enforceHttps": true,
+                        "tlsSecurityPolicy": "Policy-Min-TLS-1-0-2019-07"
+                    },
+                    "domainName": "ekk-log-us-east-1",
+                    "ebsOptions": {
+                        "__defaults": [],
+                        "ebsEnabled": true,
+                        "volumeSize": 10,
+                        "volumeType": "gp2"
+                    },
+                    "elasticsearchVersion": "OpenSearch_1.0",
+                    "encryptAtRest": {
+                        "__defaults": [],
+                        "enabled": true
+                    },
+                    "nodeToNodeEncryption": {
+                        "__defaults": [],
+                        "enabled": true
+                    }
+                },
+                "outputs": {
+                    "__meta": "{\"e2bfb730-ecaa-11e6-8f88-34363bc7c4c0\":{\"update\":3600000000000}}",
+                    "accessPolicies": "{\"Statement\":[{\"Action\":\"es:*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"0.0.0.0/0\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:es:us-west-2:863936362823:domain/ekk-log-us-east-1/*\"}],\"Version\":\"2012-10-17\"}",
+                    "advancedOptions": {
+                        "override_main_response_version": "false",
+                        "rest.action.multi.allow_explicit_index": "true"
+                    },
+                    "advancedSecurityOptions": {
+                        "enabled": true,
+                        "internalUserDatabaseEnabled": true,
+                        "masterUserOptions": {
+                            "masterUserArn": "",
+                            "masterUserName": "admin",
+                            "masterUserPassword": {
+                                "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                                "ciphertext": "AAABAKTOuU8q4rUB/DBiEyiWgYSXzgsycWfJHNRIdjtXxP/mq7ANOk/atxQc8OPfMPvDLtJp"
+                            }
+                        }
+                    },
+                    "arn": "arn:aws:es:us-west-2:863936362823:domain/ekk-log-us-east-1",
+                    "autoTuneOptions": {
+                        "desiredState": "ENABLED",
+                        "maintenanceSchedules": [],
+                        "rollbackOnDisable": "NO_ROLLBACK"
+                    },
+                    "clusterConfig": {
+                        "dedicatedMasterCount": 0,
+                        "dedicatedMasterEnabled": false,
+                        "dedicatedMasterType": "",
+                        "instanceCount": 1,
+                        "instanceType": "t3.medium.elasticsearch",
+                        "warmCount": 0,
+                        "warmEnabled": false,
+                        "warmType": "",
+                        "zoneAwarenessConfig": null,
+                        "zoneAwarenessEnabled": false
+                    },
+                    "cognitoOptions": {
+                        "enabled": false,
+                        "identityPoolId": "",
+                        "roleArn": "",
+                        "userPoolId": ""
+                    },
+                    "domainEndpointOptions": {
+                        "customEndpoint": "",
+                        "customEndpointCertificateArn": "",
+                        "customEndpointEnabled": false,
+                        "enforceHttps": true,
+                        "tlsSecurityPolicy": "Policy-Min-TLS-1-0-2019-07"
+                    },
+                    "domainId": "863936362823/ekk-log-us-east-1",
+                    "domainName": "ekk-log-us-east-1",
+                    "ebsOptions": {
+                        "ebsEnabled": true,
+                        "iops": 0,
+                        "volumeSize": 10,
+                        "volumeType": "gp2"
+                    },
+                    "elasticsearchVersion": "OpenSearch_1.0",
+                    "encryptAtRest": {
+                        "enabled": true,
+                        "kmsKeyId": "arn:aws:kms:us-west-2:863936362823:key/34791808-1cf9-449a-8e73-efcf007f80ac"
+                    },
+                    "endpoint": "search-ekk-log-us-east-1-f2xy2xpemixkc2qrbhhl5wel5e.us-west-2.es.amazonaws.com",
+                    "id": "arn:aws:es:us-west-2:863936362823:domain/ekk-log-us-east-1",
+                    "kibanaEndpoint": "search-ekk-log-us-east-1-f2xy2xpemixkc2qrbhhl5wel5e.us-west-2.es.amazonaws.com/_plugin/kibana/",
+                    "logPublishingOptions": [],
+                    "nodeToNodeEncryption": {
+                        "enabled": true
+                    },
+                    "snapshotOptions": {
+                        "automatedSnapshotStartHour": 0
+                    },
+                    "tags": {},
+                    "tagsAll": {},
+                    "vpcOptions": null
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "accessPolicies": null,
+                    "advancedSecurityOptions": null,
+                    "clusterConfig": null,
+                    "domainEndpointOptions": null,
+                    "domainName": null,
+                    "ebsOptions": null,
+                    "elasticsearchVersion": null,
+                    "encryptAtRest": null,
+                    "nodeToNodeEncryption": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:lambda/function:Function::testLambda",
+                "custom": true,
+                "id": "testLambda-133b606",
+                "type": "aws:lambda/function:Function",
+                "inputs": {
+                    "__defaults": [
+                        "memorySize",
+                        "name",
+                        "packageType",
+                        "publish",
+                        "reservedConcurrentExecutions"
+                    ],
+                    "architectures": [
+                        "x86_64"
+                    ],
+                    "code": {
+                        "4dabf18193072939515e22adb298388d": "0def7320c3a5731c473e5ecbe6d01bc7",
+                        "hash": "efce5985d05fa390e8a5c81a0dfa35ce7db928c34b39e1cb19428dd1c80330c7",
+                        "path": "./lambda_code/lambda.zip"
+                    },
+                    "environment": {
+                        "__defaults": [],
+                        "variables": {
+                            "__defaults": [],
+                            "endpoint": "search-ekk-log-us-east-1-f2xy2xpemixkc2qrbhhl5wel5e.us-west-2.es.amazonaws.com"
+                        }
+                    },
+                    "handler": "index.handler",
+                    "memorySize": 128,
+                    "name": "testLambda-133b606",
+                    "packageType": "Zip",
+                    "publish": false,
+                    "reservedConcurrentExecutions": -1,
+                    "role": "arn:aws:iam::863936362823:role/EKK-Lambda",
+                    "runtime": "nodejs12.x",
+                    "timeout": 60
+                },
+                "outputs": {
+                    "__meta": "{\"e2bfb730-ecaa-11e6-8f88-34363bc7c4c0\":{\"create\":600000000000}}",
+                    "architectures": [
+                        "x86_64"
+                    ],
+                    "arn": "arn:aws:lambda:us-west-2:863936362823:function:testLambda-133b606",
+                    "code": {
+                        "4dabf18193072939515e22adb298388d": "0def7320c3a5731c473e5ecbe6d01bc7",
+                        "hash": "efce5985d05fa390e8a5c81a0dfa35ce7db928c34b39e1cb19428dd1c80330c7",
+                        "path": "./lambda_code/lambda.zip"
+                    },
+                    "codeSigningConfigArn": "",
+                    "deadLetterConfig": null,
+                    "description": "",
+                    "environment": {
+                        "variables": {
+                            "endpoint": "search-ekk-log-us-east-1-f2xy2xpemixkc2qrbhhl5wel5e.us-west-2.es.amazonaws.com"
+                        }
+                    },
+                    "fileSystemConfig": null,
+                    "handler": "index.handler",
+                    "id": "testLambda-133b606",
+                    "imageConfig": null,
+                    "imageUri": "",
+                    "invokeArn": "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-west-2:863936362823:function:testLambda-133b606/invocations",
+                    "kmsKeyArn": "",
+                    "lastModified": "2021-12-11T18:29:38.000+0000",
+                    "layers": [],
+                    "memorySize": 128,
+                    "name": "testLambda-133b606",
+                    "packageType": "Zip",
+                    "publish": false,
+                    "qualifiedArn": "arn:aws:lambda:us-west-2:863936362823:function:testLambda-133b606:$LATEST",
+                    "reservedConcurrentExecutions": -1,
+                    "role": "arn:aws:iam::863936362823:role/EKK-Lambda",
+                    "runtime": "nodejs12.x",
+                    "signingJobArn": "",
+                    "signingProfileVersionArn": "",
+                    "sourceCodeHash": "785ZhdBfo5DopcgaDfo1zn25KMNLOeHLGUKN0cgDMMc=",
+                    "sourceCodeSize": 2735,
+                    "tags": {},
+                    "tagsAll": {},
+                    "timeout": 60,
+                    "tracingConfig": {
+                        "mode": "PassThrough"
+                    },
+                    "version": "$LATEST",
+                    "vpcConfig": null
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "dependencies": [
+                    "urn:pulumi:ecv::aws-es-firehose::aws:elasticsearch/domain:Domain::ekk-log-us-east-1",
+                    "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-Lambda"
+                ],
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "architectures": null,
+                    "code": null,
+                    "environment": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:elasticsearch/domain:Domain::ekk-log-us-east-1"
+                    ],
+                    "handler": null,
+                    "role": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-Lambda"
+                    ],
+                    "runtime": null,
+                    "timeout": null
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:kinesis/firehoseDeliveryStream:FirehoseDeliveryStream::EKK-LogFirehose-apachelog",
+                "custom": true,
+                "id": "arn:aws:firehose:us-west-2:863936362823:deliverystream/EKK-LogFirehose-apachelog",
+                "type": "aws:kinesis/firehoseDeliveryStream:FirehoseDeliveryStream",
+                "inputs": {
+                    "__defaults": [],
+                    "destination": "elasticsearch",
+                    "elasticsearchConfiguration": {
+                        "__defaults": [
+                            "bufferingInterval",
+                            "bufferingSize",
+                            "indexRotationPeriod",
+                            "retryDuration",
+                            "s3BackupMode"
+                        ],
+                        "bufferingInterval": 300,
+                        "bufferingSize": 5,
+                        "domainArn": "arn:aws:es:us-west-2:863936362823:domain/ekk-log-us-east-1",
+                        "indexName": "apachelog",
+                        "indexRotationPeriod": "OneDay",
+                        "processingConfiguration": {
+                            "__defaults": [],
+                            "enabled": false
+                        },
+                        "retryDuration": 300,
+                        "roleArn": "arn:aws:iam::863936362823:role/EKK-Firhose",
+                        "s3BackupMode": "FailedDocumentsOnly"
+                    },
+                    "name": "EKK-LogFirehose-apachelog",
+                    "s3Configuration": {
+                        "__defaults": [
+                            "compressionFormat"
+                        ],
+                        "bucketArn": "arn:aws:s3:::ekk-bucket-fcb8c37",
+                        "bufferInterval": 400,
+                        "bufferSize": 10,
+                        "compressionFormat": "UNCOMPRESSED",
+                        "roleArn": "arn:aws:iam::863936362823:role/EKK-Firhose"
+                    }
+                },
+                "outputs": {
+                    "__meta": "{\"schema_version\":\"1\"}",
+                    "arn": "arn:aws:firehose:us-west-2:863936362823:deliverystream/EKK-LogFirehose-apachelog",
+                    "destination": "elasticsearch",
+                    "destinationId": "destinationId-000000000001",
+                    "elasticsearchConfiguration": {
+                        "bufferingInterval": 300,
+                        "bufferingSize": 5,
+                        "cloudwatchLoggingOptions": {
+                            "enabled": false,
+                            "logGroupName": "",
+                            "logStreamName": ""
+                        },
+                        "clusterEndpoint": "",
+                        "domainArn": "arn:aws:es:us-west-2:863936362823:domain/ekk-log-us-east-1",
+                        "indexName": "apachelog",
+                        "indexRotationPeriod": "OneDay",
+                        "processingConfiguration": {
+                            "enabled": false,
+                            "processors": []
+                        },
+                        "retryDuration": 300,
+                        "roleArn": "arn:aws:iam::863936362823:role/EKK-Firhose",
+                        "s3BackupMode": "FailedDocumentsOnly",
+                        "typeName": "",
+                        "vpcConfig": null
+                    },
+                    "extendedS3Configuration": null,
+                    "httpEndpointConfiguration": null,
+                    "id": "arn:aws:firehose:us-west-2:863936362823:deliverystream/EKK-LogFirehose-apachelog",
+                    "kinesisSourceConfiguration": null,
+                    "name": "EKK-LogFirehose-apachelog",
+                    "redshiftConfiguration": null,
+                    "s3Configuration": {
+                        "bucketArn": "arn:aws:s3:::ekk-bucket-fcb8c37",
+                        "bufferInterval": 400,
+                        "bufferSize": 10,
+                        "cloudwatchLoggingOptions": {
+                            "enabled": false,
+                            "logGroupName": "",
+                            "logStreamName": ""
+                        },
+                        "compressionFormat": "UNCOMPRESSED",
+                        "kmsKeyArn": "",
+                        "prefix": "",
+                        "roleArn": "arn:aws:iam::863936362823:role/EKK-Firhose"
+                    },
+                    "serverSideEncryption": {
+                        "enabled": false,
+                        "keyArn": "",
+                        "keyType": "AWS_OWNED_CMK"
+                    },
+                    "splunkConfiguration": null,
+                    "tags": {},
+                    "tagsAll": {},
+                    "versionId": "2"
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "dependencies": [
+                    "urn:pulumi:ecv::aws-es-firehose::aws:elasticsearch/domain:Domain::ekk-log-us-east-1",
+                    "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-Firhose",
+                    "urn:pulumi:ecv::aws-es-firehose::aws:s3/bucket:Bucket::ekk-bucket"
+                ],
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "destination": null,
+                    "elasticsearchConfiguration": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-Firhose",
+                        "urn:pulumi:ecv::aws-es-firehose::aws:elasticsearch/domain:Domain::ekk-log-us-east-1"
+                    ],
+                    "name": null,
+                    "s3Configuration": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:iam/role:Role::EKK-Firhose",
+                        "urn:pulumi:ecv::aws-es-firehose::aws:s3/bucket:Bucket::ekk-bucket"
+                    ]
+                }
+            },
+            {
+                "urn": "urn:pulumi:ecv::aws-es-firehose::aws:lambda/permission:Permission::allowCloudwatch",
+                "custom": true,
+                "id": "allow-cloudwatch-lambda",
+                "type": "aws:lambda/permission:Permission",
+                "inputs": {
+                    "__defaults": [],
+                    "action": "lambda:InvokeFunction",
+                    "function": "testLambda-133b606",
+                    "principal": "logs.us-west-2.amazonaws.com",
+                    "sourceArn": "arn:aws:logs:us-west-2:863936362823:log-group:exampleLogGroup-f351627",
+                    "statementId": "allow-cloudwatch-lambda"
+                },
+                "outputs": {
+                    "action": "lambda:InvokeFunction",
+                    "function": "testLambda-133b606",
+                    "id": "allow-cloudwatch-lambda",
+                    "principal": "logs.us-west-2.amazonaws.com",
+                    "qualifier": "",
+                    "sourceArn": "arn:aws:logs:us-west-2:863936362823:log-group:exampleLogGroup-f351627",
+                    "statementId": "allow-cloudwatch-lambda"
+                },
+                "parent": "urn:pulumi:ecv::aws-es-firehose::pulumi:pulumi:Stack::aws-es-firehose-ecv",
+                "dependencies": [
+                    "urn:pulumi:ecv::aws-es-firehose::aws:lambda/function:Function::testLambda",
+                    "urn:pulumi:ecv::aws-es-firehose::aws:cloudwatch/logGroup:LogGroup::exampleLogGroup"
+                ],
+                "provider": "urn:pulumi:ecv::aws-es-firehose::pulumi:providers:aws::default_4_32_0::710f303c-b2b5-424d-8a64-79898e3a03f4",
+                "propertyDependencies": {
+                    "action": null,
+                    "function": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:lambda/function:Function::testLambda"
+                    ],
+                    "principal": null,
+                    "sourceArn": [
+                        "urn:pulumi:ecv::aws-es-firehose::aws:cloudwatch/logGroup:LogGroup::exampleLogGroup"
+                    ],
+                    "statementId": null
+                }
+            }
+        ]
+    }
+}

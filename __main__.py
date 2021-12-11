@@ -201,6 +201,40 @@ ekk_log_us_east_1 = aws.elasticsearch.Domain(opensearch_domain,
     )
 pulumi.export("es domain:", ekk_log_us_east_1.endpoint)
  
+# Lambda
+test_lambda = aws.lambda_.Function("testLambda",
+    code=pulumi.FileArchive("./lambda_code/lambda.zip"),
+    role=ekk_lambda.arn,
+    handler="index.handler",
+    runtime="nodejs12.x",
+    architectures=["x86_64"],
+    timeout=60,
+    environment=aws.lambda_.FunctionEnvironmentArgs(
+        variables={
+            "endpoint": ekk_log_us_east_1.endpoint,
+        }
+    ),
+    )
+ 
+ 
+allow_cloudwatch = aws.lambda_.Permission("allowCloudwatch",
+    action="lambda:InvokeFunction",
+    function=test_lambda.name,
+    principal="logs.us-west-2.amazonaws.com",
+    source_arn=pulumi.Output.concat(example_log_group.arn, ":*"),
+    # qualifier=test_alias.name,
+    statement_id = "allow-cloudwatch-lambda"
+    )
+ 
+ # log group subscription filter
+test_lambdafunction_logfilter = aws.cloudwatch.LogSubscriptionFilter("testLambdafunctionLogfilter",
+    # role_arn=ekk_lambda.arn,
+    log_group=example_log_group.id,
+    filter_pattern="863936362823_CloudTrail_us-west-2",
+    destination_arn=test_lambda.arn,
+    )
+
+
 
 ekk_firehose = aws.kinesis.FirehoseDeliveryStream(ekk_firehose_name,
     destination="elasticsearch",
