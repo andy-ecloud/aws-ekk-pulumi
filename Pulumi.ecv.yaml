@@ -1,5 +1,5 @@
 config:
   aws-es-firehose:dbPassword:
-    secure: AAABACAWojJWI7xJUllvqvLeFqkBhvRIzqkOcevuXPnavcJF2c12kBnc+rIGOoXqUCLiVZoA
+    secure: AAABAIXBAzWKhdFDAdb1Aj5HGocbX0b7zWYkV1Sry98plC0HVJf4NiUiUkoEJ1NIPcVC/Q==
   aws:profile: ecv
   aws:region: us-west-2

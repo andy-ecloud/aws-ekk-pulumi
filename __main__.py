@@ -74,6 +74,9 @@ ekk_lambda = aws.iam.Role("EKK-Lambda",
 ekk_log_us_east_1 = aws.elasticsearch.Domain(opensearch_domain,
     domain_name=opensearch_domain,
     elasticsearch_version="OpenSearch_1.0",
+    cluster_config=aws.elasticsearch.DomainClusterConfigArgs(
+        instance_type="t3.medium.search",
+    ),
     ebs_options=aws.elasticsearch.DomainEbsOptionsArgs(
         ebs_enabled=True,
         volume_size=10,
@@ -194,7 +197,6 @@ kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
     )
 )
 
-ekk_firehose_name = "fef"
 userdata = pulumi.Output.concat(
 """#!/bin/bash
 # install 
