@@ -6,6 +6,10 @@ import pulumi_aws as aws
 import json
 import pulumi_tls as tls
 
+tags = {
+    'Owner': "andy.chuang"
+}
+
 
 # get current region
 current = aws.get_caller_identity()
@@ -190,7 +194,7 @@ kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
     )
 )
 
-
+ekk_firehose_name = "fef"
 userdata = pulumi.Output.concat(
 """#!/bin/bash
 # install 
@@ -311,6 +315,6 @@ ec2_apachelog_poc = aws.ec2.Instance('EC2-ApacheLog-poc',
     user_data=userdata,
     ami=ami.id,
     key_name=keypair.id,
-    tags={"Name": "EC2-ApacheLog-poc"},
-    volume_tags={"Name": "EC2-ApacheLog-poc"},
+    tags=dict(tags, **{"Name": "EC2-ApacheLog-poc"}),
+    volume_tags=dict(tags, **{"Name": "EC2-ApacheLog-poc"}),
     )
