@@ -25,97 +25,15 @@ ip = "0.0.0.0/0" #"59.124.14.121/32"
 opensearch_domain = "ekk-log-us-east-1"
 ekk_firehose_name = "EKK-LogFirehose-apachelog"
 
-# Create an AWS resource (S3 Bucket)
-ekk_bucket_name = "ekk-bucket"
-ekk_bucket = aws.s3.Bucket(ekk_bucket_name,
-    force_destroy = True,
-)
-
-# ekk_bucket_policy = aws.s3.BucketPolicy("ekk-bucketPolicy",
-#     bucket=ekk_bucket.id,
-#     policy=pulumi.Output.all([]).apply(
-#         lambda args: json.dumps(
-#             {
-#                 "Version": "2012-10-17",
-#                 "Statement": [
-#                     {
-#                         "Sid": "PublicRead",
-#                         "Effect": "Allow",
-#                         "Principal": {"Service": "cloudtrail.amazonaws.com"},
-#                         "Action": ["s3:GetObject","s3:GetObjectVersion"],
-#                         "Resource": ["{}/*".format(ekk_bucket.arn)]
-#                     }
-#                 ]
-#             }
-#         )
-#     )
-# )
-
-# Export the name of the bucket
-pulumi.export('bucket_name', ekk_bucket.id)
-
-# Cloudtrail
-current_partition = aws.get_partition()
-example_log_group = aws.cloudwatch.LogGroup("exampleLogGroup")
-pulumi.export("log group arn", example_log_group.arn)
-test_role = aws.iam.Role("testRole", assume_role_policy=f"""{{
-  "Version": "2012-10-17",
-  "Statement": [
-    {{
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {{
-        "Service": "cloudtrail.{current_partition.dns_suffix}"
-      }},
-      "Action": "sts:AssumeRole"
-    }}
-  ]
-}}
-""")
-test_role_policy = aws.iam.RolePolicy("testRolePolicy",
-    role=test_role.id,
-    policy=pulumi.Output.all().apply(
-            lambda args: json.dumps(
-                {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Sid": "AWSCloudTrailCreateLogStream",
-                            "Effect": "Allow",
-                            "Action": [
-                                "logs:CreateLogStream",
-                                "logs:PutLogEvents"
-                            ],
-                            "Resource": "*"
-                        }
-                    ]
-                }
-            )
-        ),
-    )
-# # cloudtrail_bucket = aws.s3.Bucket("cloudtrail-bucket")
-example_trail = aws.cloudtrail.Trail("exampleTrail",
-    s3_bucket_name=ekk_bucket.id,
-    s3_key_prefix="prefix",
-    cloud_watch_logs_role_arn=test_role.arn,
-    cloud_watch_logs_group_arn=example_log_group.arn.apply(lambda arn: f"{arn}:*"),
-    is_multi_region_trail=True,
-    enable_log_file_validation=True,
-    include_global_service_events=True,
-    )
-# # CloudTrail requires the Log Stream wildcard
-
-
-
-
+# Iam Policy
 AmazonKinesisFirehoseFullAccess = aws.iam.get_policy(name="AmazonKinesisFirehoseFullAccess")
 AmazonS3FullAccess = aws.iam.get_policy(name="AmazonS3FullAccess")
 CloudWatchFullAccess = aws.iam.get_policy(name="CloudWatchFullAccess")
 AmazonESFullAccess = aws.iam.get_policy(name="AmazonESFullAccess")
 CloudWatchFullAccess  = aws.iam.get_policy(name="CloudWatchFullAccess")
 
-
-ekk_ec2 = aws.iam.Role("EKK-EC2",
+# Iam Role for ekk
+ekk_ec2_role = aws.iam.Role("EKK-EC2",
     assume_role_policy="{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
     description="Allows EC2 instances to call AWS services on your behalf.",
     force_detach_policies=False,
@@ -125,7 +43,7 @@ ekk_ec2 = aws.iam.Role("EKK-EC2",
     managed_policy_arns=[AmazonKinesisFirehoseFullAccess.arn],
     )
 
-ekk_firehose = aws.iam.Role("EKK-Firhose",
+ekk_firehose_role = aws.iam.Role("EKK-Firhose",
     assume_role_policy="{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"firehose.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
     description="Allows Firhose to call AWS services on your behalf.",
     force_detach_policies=False,
@@ -135,7 +53,7 @@ ekk_firehose = aws.iam.Role("EKK-Firhose",
     managed_policy_arns=[AmazonS3FullAccess.arn, CloudWatchFullAccess.arn, AmazonESFullAccess.arn],
     )
     
-ekk_lambda = aws.iam.Role("EKK-Lambda",
+ekk_lambda_role = aws.iam.Role("EKK-Lambda",
     assume_role_policy="{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
     description="Allows Lambda to call AWS services on your behalf.",
     force_detach_policies=False,
@@ -200,11 +118,98 @@ ekk_log_us_east_1 = aws.elasticsearch.Domain(opensearch_domain,
         ),
     )
 pulumi.export("es domain:", ekk_log_us_east_1.endpoint)
- 
+
+# Create an AWS resource (S3 Bucket)
+ekk_bucket_name = "ekk-bucket"
+ekk_bucket = aws.s3.Bucket(ekk_bucket_name,
+    force_destroy = True,
+)
+pulumi.export("ekk bucket id", ekk_bucket.id)
+pulumi.export("ekk bucket arn", ekk_bucket.arn)
+
+ekk_bucket_policy = aws.s3.BucketPolicy("ekk-bucketPolicy",
+    bucket=ekk_bucket.id,
+    policy=pulumi.Output.all(ekk_bucket.arn).apply(
+        lambda args: json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Id": "MYBUCKETPOLICY",
+                "Statement": [
+                    {
+                        "Sid": "Allow",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            args[0],
+                            f"{args[0]}/*",
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+)
+
+# Cloudtrail
+current_partition = aws.get_partition()
+
+cloudtrail_log_group = aws.cloudwatch.LogGroup("cloudtrail-log-group")
+pulumi.export("log group arn", cloudtrail_log_group.arn)
+
+aws_cloud_trail_create_log_stream_role = aws.iam.Role("AWSCloudTrailCreateLogStreamRole", 
+    assume_role_policy=f"""{{
+  "Version": "2012-10-17",
+  "Statement": [
+    {{
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {{
+        "Service": "cloudtrail.{current_partition.dns_suffix}"
+      }},
+      "Action": "sts:AssumeRole"
+    }}
+  ]
+}}
+""")
+
+aws_cloud_trail_create_log_stream_role_policy = aws.iam.RolePolicy("AWSCloudTrailCreateLogStreamRolePolicy",
+    role=aws_cloud_trail_create_log_stream_role.id,
+    policy=pulumi.Output.all().apply(
+        lambda args: json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "AWSCloudTrailCreateLogStream",
+                        "Effect": "Allow",
+                        "Action": [
+                            "logs:CreateLogStream",
+                            "logs:PutLogEvents"
+                        ],
+                        "Resource": "*"
+                    }
+                ]
+            }
+        )
+    ),
+)
+
+# # cloudtrail_bucket = aws.s3.Bucket("cloudtrail-bucket")
+ekk_cloud_trail = aws.cloudtrail.Trail("ekk-cloudtrail",
+    s3_bucket_name=ekk_bucket.id,
+    s3_key_prefix="prefix",
+    cloud_watch_logs_role_arn=aws_cloud_trail_create_log_stream_role.arn,
+    cloud_watch_logs_group_arn=cloudtrail_log_group.arn.apply(lambda arn: f"{arn}:*"),
+    is_multi_region_trail=True,
+    enable_log_file_validation=True,
+    include_global_service_events=True,
+    )
+
 # Lambda
-test_lambda = aws.lambda_.Function("testLambda",
+ekk_log_to_es_lambda = aws.lambda_.Function("ekk-log-to-elasticsearch",
     code=pulumi.FileArchive("./lambda_code/index.zip"),
-    role=ekk_lambda.arn,
+    role=ekk_lambda_role.arn,
     handler="index.handler",
     runtime="nodejs12.x",
     architectures=["x86_64"],
@@ -215,101 +220,101 @@ test_lambda = aws.lambda_.Function("testLambda",
         }
     ),
     )
-    
+
 # lambda log group
-ekk_log_group = aws.cloudwatch.LogGroup("ekk_LogGroup",
-    name=pulumi.Output.concat("/aws/lambda/", test_lambda.id)
+ekk_lambda_log_group = aws.cloudwatch.LogGroup("ekk-log-group",
+    name=pulumi.Output.concat("/aws/lambda/", ekk_log_to_es_lambda.id)
     )
- 
+
 allow_cloudwatch = aws.lambda_.Permission("allowCloudwatch",
     action="lambda:InvokeFunction",
-    function=test_lambda.name,
+    function=ekk_log_to_es_lambda.name,
     principal="logs.amazonaws.com",
-    source_arn=pulumi.Output.concat(example_log_group.arn, ":*"),
+    source_arn=pulumi.Output.concat(cloudtrail_log_group.arn, ":*"),
     # qualifier=test_alias.name,
     statement_id = "allow-cloudwatch-lambda"
     )
- 
- # log group subscription filter
-test_lambdafunction_logfilter = aws.cloudwatch.LogSubscriptionFilter("testLambdafunctionLogfilter",
-    # role_arn=ekk_lambda.arn,
-    log_group=example_log_group.id,
-    filter_pattern="863936362823_CloudTrail_us-west-2",
-    destination_arn=test_lambda.arn,
+
+# log group subscription filter
+ekk_log_to_es_lambda_logfilter = aws.cloudwatch.LogSubscriptionFilter("ekk-log-to-es-lambda-log-filterr",
+    # role_arn=ekk_lambda_role.arn,
+    log_group=cloudtrail_log_group.id,
+    filter_pattern="",
+    destination_arn=ekk_log_to_es_lambda.arn,
     )
 
 
 
-ekk_firehose = aws.kinesis.FirehoseDeliveryStream(ekk_firehose_name,
-    destination="elasticsearch",
-    s3_configuration=aws.kinesis.FirehoseDeliveryStreamS3ConfigurationArgs(
-        role_arn=ekk_firehose.arn,
-        bucket_arn=ekk_bucket.arn,
-        buffer_size=10,
-        buffer_interval=400,
-        # compression_format="GZIP",
-    ),
-    name=ekk_firehose_name,
-    elasticsearch_configuration=aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationArgs(
-        domain_arn=ekk_log_us_east_1.arn,
-        role_arn=ekk_firehose.arn,
-        index_name="apachelog",
-        # type_name="log",
-        processing_configuration=aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationArgs(
-            enabled=False,
-            # processors=[aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationProcessorArgs(
-            #     type="Lambda",
-            #     parameters=[aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationProcessorParameterArgs(
-            #         parameter_name="LambdaArn",
-            #         parameter_value=f"{aws_lambda_function['lambda_processor']['arn']}:$LATEST",
-            #     )],
-            # )],
-        ),
-    ))
-pulumi.export("firehose:", ekk_firehose.id) 
-pulumi.export("firehose tags all:", ekk_firehose.tags_all)   
+# ekk_firehose = aws.kinesis.FirehoseDeliveryStream(ekk_firehose_name,
+#     destination="elasticsearch",
+#     s3_configuration=aws.kinesis.FirehoseDeliveryStreamS3ConfigurationArgs(
+#         role_arn=ekk_firehose_role.arn,
+#         bucket_arn=ekk_bucket.arn,
+#         buffer_size=10,
+#         buffer_interval=400,
+#         # compression_format="GZIP",
+#     ),
+#     name=ekk_firehose_name,
+#     elasticsearch_configuration=aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationArgs(
+#         domain_arn=ekk_log_us_east_1.arn,
+#         role_arn=ekk_firehose_role.arn,
+#         index_name="apachelog",
+#         # type_name="log",
+#         processing_configuration=aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationArgs(
+#             enabled=False,
+#             # processors=[aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationProcessorArgs(
+#             #     type="Lambda",
+#             #     parameters=[aws.kinesis.FirehoseDeliveryStreamElasticsearchConfigurationProcessingConfigurationProcessorParameterArgs(
+#             #         parameter_name="LambdaArn",
+#             #         parameter_value=f"{aws_lambda_function['lambda_processor']['arn']}:$LATEST",
+#             #     )],
+#             # )],
+#         ),
+#     ))
+# pulumi.export("firehose:", ekk_firehose.id) 
+# pulumi.export("firehose tags all:", ekk_firehose.tags_all)   
 
-kinesis_agent_json=pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
-    json.dumps(
-        {
-          "cloudwatch.emitMetrics": True,
-          "firehose.endpoint": "{}".format(ekk_log_us_east_1.endpoint),
-          "flows": [
-            {
-              "filePattern": "/var/log/httpd/access_log*",
-              "deliveryStream": "{}".format(args[0]),
-              "dataProcessingOptions": [
-                {
-                  "optionName": "LOGTOJSON",
-                  "logFormat": "COMMONAPACHELOG"
-                }
-              ]
-            }
-          ]
-        }
-    )
-)
+# kinesis_agent_json=pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
+#     json.dumps(
+#         {
+#           "cloudwatch.emitMetrics": True,
+#           "firehose.endpoint": "{}".format(ekk_log_us_east_1.endpoint),
+#           "flows": [
+#             {
+#               "filePattern": "/var/log/httpd/access_log*",
+#               "deliveryStream": "{}".format(args[0]),
+#               "dataProcessingOptions": [
+#                 {
+#                   "optionName": "LOGTOJSON",
+#                   "logFormat": "COMMONAPACHELOG"
+#                 }
+#               ]
+#             }
+#           ]
+#         }
+#     )
+# )
 
-kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
-    json.dumps(
-        {
-          "cloudwatch.emitMetrics": True,
-          "firehose.endpoint": "{}".format(ekk_log_us_east_1.endpoint),
-          "flows": [
-            {
-              "filePattern": "/var/log/httpd/access_log*",
-              "deliveryStream": "{}".format(args[0]),
-              "dataProcessingOptions": [
-                {
-                  "optionName": "LOGTOJSON",
-                  "logFormat": "COMMONAPACHELOG"
-                }
-              ]
-            }
-          ]
-        }
-    )
-)
+# kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
+#     json.dumps(
+#         {
+#           "cloudwatch.emitMetrics": True,
+#           "firehose.endpoint": "{}".format(ekk_log_us_east_1.endpoint),
+#           "flows": [
+#             {
+#               "filePattern": "/var/log/httpd/access_log*",
+#               "deliveryStream": "{}".format(args[0]),
+#               "dataProcessingOptions": [
+#                 {
+#                   "optionName": "LOGTOJSON",
+#                   "logFormat": "COMMONAPACHELOG"
+#                 }
+#               ]
+#             }
+#           ]
+#         }
+#     )
+# )
 
 # userdata = pulumi.Output.concat(
 # """#!/bin/bash
@@ -434,3 +439,7 @@ kinesis_agent_json = pulumi.Output.all([ekk_firehose_name]).apply(lambda args:
 #     tags=dict(tags, **{"Name": "EC2-ApacheLog-poc"}),
 #     volume_tags=dict(tags, **{"Name": "EC2-ApacheLog-poc"}),
 #     )
+
+
+# TODO
+pulumi.export("TODO ----> opensearch dashboard -> role mapping", ekk_lambda_role.arn)
